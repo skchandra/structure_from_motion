@@ -8,13 +8,16 @@ from cv_bridge import CvBridge
 
 from show_depth import *
 
+D = np.array( [0.07151361939824905, -0.19481871818164997, 0.006885482396599795, -0.0065266433799991965, 0.0])
+K = np.array( [[634.1625796919535, 0.0, 302.8222037975313], [0.0, 633.0839114382693, 253.7043901565232], [0.0, 0.0, 1.0]])
+
 class Reconstruct3D:
 	def __init__(self):
 		rospy.init_node('construct_images')
 		rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
 		rospy.Subscriber('/odom', Odometry, self.odom_callback)
 
-		self.cap = cv2.VideoCapture(0)
+		#self.cap = cv2.VideoCapture('/camera/image_raw')
 
 		self.image = None
 		self.bridge = CvBridge()
@@ -27,14 +30,14 @@ class Reconstruct3D:
 		self.calculated_flow = False
 
 	def image_callback(self, msg):
-		ret, self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
 
 	def odom_callback(self, msg):
 		pass
 
 	def optical_flow(self):
-		sift = cv2.SIFT()
+		"""sift = cv2.SIFT()
 
 		old_image = cv2.cvtColor(self.image1, cv2.COLOR_BGR2GRAY)
 		new_image = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
@@ -50,12 +53,28 @@ class Reconstruct3D:
 		    if m.distance < 50:
 		        good.append([m])
 
+		# Apply ratio test
+		for m,n in matches:
+		    if m.distance < 0.75*n.distance:
+		    	self.correspondences[0].append((m.queryIdx, m.trainIdx))
+		    	self.correspondences[1].append((n.queryIdx, n.trainIdx))"""
 
-		# # Apply ratio test
-		# for m,n in matches:
-		#     if m.distance < 0.75*n.distance:
-		#     	self.correspondences[0].append((m.queryIdx, m.trainIdx))
-		#     	self.correspondences[1].append((n.queryIdx, n.trainIdx))
+		old_image = cv2.cvtColor(self.image1, cv2.COLOR_BGR2GRAY)
+		new_image = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
+		cv2.imshow('distorted', old_image)
+		old_image = cv2.undistort(old_image,K,D)
+		cv2.imshow('undistort', old_image)
+		new_image = cv2.undistort(new_image,K,D)
+		flow = cv2.calcOpticalFlowFarneback(old_image, new_image, 0.5, 1, 3, 15, 3, 5, 1)
+		
+		# create array of points
+		for y in range(old_image.shape[0]):
+			for x in range(old_image.shape[1]):
+				if math.sqrt( flow[y][x][0]**2 + flow[y][x][1]**2 > 140 ):
+					self.correspondences[0].append((y,x))
+					self.correspondences[1].append((y + flow[y][x][0],
+													x + flow[y][x][1]))
+
 
 		# sift = cv2.SIFT()
 
@@ -89,7 +108,7 @@ class Reconstruct3D:
 
 		# color = [255,0,0]
 
-		# # Keypoint matching
+		# Keypoint matching
 		# old_image = cv2.cvtColor(self.image1, cv2.COLOR_BGR2GRAY)
 		# new_image = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
 		# sift = cv2.SIFT()
@@ -115,11 +134,11 @@ class Reconstruct3D:
 		r = rospy.Rate(10)
 
 		while not rospy.is_shutdown():
-			ret, self.image = self.cap.read()
+			#ret, self.image = self.cap.read()
 			if self.image != None:
 				if self.image2 == None:
 					cv2.imshow('image_raw', self.image)
-					if cv2.waitKey(20) & 0xFF == ord('c'):
+					if cv2.waitKey(1) & 0xFF == ord('c'):
 						if self.image1 == None:
 							self.image1 = self.image
 						elif self.image2 == None:

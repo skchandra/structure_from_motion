@@ -4,8 +4,8 @@ import cv2
 import pickle
 import numpy as np
 
-D = np.array( [0.08683, -0.28966000000000003, -0.00045000000000000004, -0.00015000000000000001, 0.0])
-K = np.array( [[651.38582, 0.0, 327.26766], [0.0, 650.2441, 242.38098],[ 0.0, 0.0, 1.0]])
+D = np.array( [0.07151361939824905, -0.19481871818164997, 0.006885482396599795, -0.0065266433799991965, 0.0])
+K = np.array( [[634.1625796919535, 0.0, 302.8222037975313], [0.0, 633.0839114382693, 253.7043901565232], [0.0, 0.0, 1.0]])
 W = np.array([[0.0, -1.0, 0.0],
 			  [1.0, 0.0, 0.0],
 			  [0.0, 0.0, 1.0]])
@@ -90,6 +90,12 @@ def show_depth(im1, im2, correspondences):
 	im2_pts_augmented = np.zeros((1,im2_pts.shape[0],im2_pts.shape[1]))
 	im2_pts_augmented[0,:,:] = im2_pts
 
+	#im1_pts_ud = im1_pts_augmented
+	#im2_pts_ud = im2_pts_augmented
+	print im1_pts_augmented.shape
+	print im2_pts_augmented.shape
+	print K.shape
+	print D.shape
 	im1_pts_ud = cv2.undistortPoints(im1_pts_augmented,K,D)
 	im2_pts_ud = cv2.undistortPoints(im2_pts_augmented,K,D)
 
