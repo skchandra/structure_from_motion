@@ -61,20 +61,19 @@ class Reconstruct3D:
 
 		old_image = cv2.cvtColor(self.image1, cv2.COLOR_BGR2GRAY)
 		new_image = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
-		cv2.imshow('distorted', old_image)
-		old_image = cv2.undistort(old_image,K,D)
-		cv2.imshow('undistort', old_image)
-		new_image = cv2.undistort(new_image,K,D)
+		# cv2.imshow('distorted', old_image)
+		# old_image = cv2.undistort(old_image,K,D)
+		# cv2.imshow('undistort', old_image)
+		# new_image = cv2.undistort(new_image,K,D)
 		flow = cv2.calcOpticalFlowFarneback(old_image, new_image, 0.5, 1, 3, 15, 3, 5, 1)
 		
 		# create array of points
-		for y in range(old_image.shape[0]):
-			for x in range(old_image.shape[1]):
-				if math.sqrt( flow[y][x][0]**2 + flow[y][x][1]**2 > 140 ):
+		for y in range(0, old_image.shape[0], 6):
+			for x in range(0, old_image.shape[1], 6):
+				if math.sqrt( flow[y][x][0]**2 + flow[y][x][1]**2 > 1000 ):
 					self.correspondences[0].append((y,x))
 					self.correspondences[1].append((y + flow[y][x][0],
 													x + flow[y][x][1]))
-
 
 		# sift = cv2.SIFT()
 

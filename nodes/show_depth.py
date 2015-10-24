@@ -3,6 +3,7 @@
 import cv2
 import pickle
 import numpy as np
+import matplotlib.pyplot as plt
 
 D = np.array( [0.07151361939824905, -0.19481871818164997, 0.006885482396599795, -0.0065266433799991965, 0.0])
 K = np.array( [[634.1625796919535, 0.0, 302.8222037975313], [0.0, 633.0839114382693, 253.7043901565232], [0.0, 0.0, 1.0]])
@@ -94,8 +95,6 @@ def show_depth(im1, im2, correspondences):
 	#im2_pts_ud = im2_pts_augmented
 	print im1_pts_augmented.shape
 	print im2_pts_augmented.shape
-	print K.shape
-	print D.shape
 	im1_pts_ud = cv2.undistortPoints(im1_pts_augmented,K,D)
 	im2_pts_ud = cv2.undistortPoints(im2_pts_augmented,K,D)
 
@@ -147,15 +146,35 @@ def show_depth(im1, im2, correspondences):
 		infront_of_camera.append(test_triangulation(P,pclouds[i])+test_triangulation(P1_possibilities[i],pclouds[i]))
 
 	best_pcloud = pclouds[np.argmax(infront_of_camera)]
-	depths = best_pcloud[:,2] - min(best_pcloud[:,2])
-	depths = depths / max(depths)
+	# depths = best_pcloud[:,2] - min(best_pcloud[:,2])
+	# depths = depths / max(depths)
 
-	for i in range(best_pcloud.shape[0]):
-		cv2.circle(im,(int(im1_pts[i,0]),int(im1_pts[i,1])),int(max(1.0,depths[i]*20.0)),(0,255,0),1)
+	x = [i[0] for i in best_pcloud]
+	y = [i[1] for i in best_pcloud]
+	z = [i[2] for i in best_pcloud]
+	z = (z - min(z)) / max(z)
 
-	cv2.imshow("MYWIN",im)
-	cv2.setMouseCallback("MYWIN",mouse_event,im)
-	while True:
-		cv2.imshow("MYWIN",im)
-		cv2.waitKey(50)
-	cv2.destroyAllWindows()
+	m = 3
+	for i in range(len(x)):
+		if abs(x[i] - np.mean(x)) > m * np.std(x) or abs(y[i] - np.mean(y)) > m * np.std(y):
+			x[i] = 0
+			y[i] = 0
+			z[i] = 0
+
+	import matplotlib.pyplot as plt
+	from mpl_toolkits.mplot3d import Axes3D
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	ax.scatter(x, y, z)
+	plt.show()
+	
+
+	# for i in range(best_pcloud.shape[0]):
+	# 	cv2.circle(im,(int(im1_pts[i,0]),int(im1_pts[i,1])),int(max(1.0,depths[i]*20.0)),(0,255,0),1)
+
+	# cv2.imshow("MYWIN",im)
+	# cv2.setMouseCallback("MYWIN",mouse_event,im)
+	# while True:
+	# 	cv2.imshow("MYWIN",im)
+	# 	cv2.waitKey(50)
+	# cv2.destroyAllWindows()
