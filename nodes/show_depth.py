@@ -5,8 +5,8 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-D = np.array( [0.07151361939824905, -0.19481871818164997, 0.006885482396599795, -0.0065266433799991965, 0.0])
-K = np.array( [[634.1625796919535, 0.0, 302.8222037975313], [0.0, 633.0839114382693, 253.7043901565232], [0.0, 0.0, 1.0]])
+D = np.array( [0.12969982463039115, -0.3662323365747535, -0.0047588179431673535, 0.0032280633422334627, 0.0])
+K = np.array( [[672.9140718714626, 0.0, 317.4277026418419], [0.0, 670.9812424489073, 216.90441559892045], [0.0, 0.0, 1.0]])
 W = np.array([[0.0, -1.0, 0.0],
 			  [1.0, 0.0, 0.0],
 			  [0.0, 0.0, 1.0]])
@@ -83,8 +83,8 @@ def show_depth(im1, im2, correspondences):
 		im2_pts[i,0] = correspondences[1][i][0]
 		im2_pts[i,1] = correspondences[1][i][1]
 
-		cv2.circle(im,(int(im1_pts[i,0]),int(im1_pts[i,1])),2,(255,0,0),2)
-		cv2.circle(im,(int(im2_pts[i,0]+im1.shape[1]),int(im2_pts[i,1])),2,(255,0,0),2)
+		# cv2.circle(im,(int(im1_pts[i,0]),int(im1_pts[i,1])),2,(255,0,0),2)
+		# cv2.circle(im,(int(im2_pts[i,0]+im1.shape[1]),int(im2_pts[i,1])),2,(255,0,0),2)
 
 	im1_pts_augmented = np.zeros((1,im1_pts.shape[0],im1_pts.shape[1]))
 	im1_pts_augmented[0,:,:] = im1_pts
@@ -153,6 +153,7 @@ def show_depth(im1, im2, correspondences):
 	y = [i[1] for i in best_pcloud]
 	z = [i[2] for i in best_pcloud]
 	z = (z - min(z)) / max(z)
+	#z = np.zeros(len(x))
 
 	m = 3
 	for i in range(len(x)):
@@ -169,12 +170,12 @@ def show_depth(im1, im2, correspondences):
 	plt.show()
 	
 
-	# for i in range(best_pcloud.shape[0]):
-	# 	cv2.circle(im,(int(im1_pts[i,0]),int(im1_pts[i,1])),int(max(1.0,depths[i]*20.0)),(0,255,0),1)
+	for i in range(best_pcloud.shape[0]):
+		cv2.circle(im,(int(im1_pts[i,1]),int(im1_pts[i,0])),1,(0,255,0),1)
 
-	# cv2.imshow("MYWIN",im)
-	# cv2.setMouseCallback("MYWIN",mouse_event,im)
-	# while True:
-	# 	cv2.imshow("MYWIN",im)
-	# 	cv2.waitKey(50)
-	# cv2.destroyAllWindows()
+	cv2.imshow("MYWIN",im)
+	cv2.setMouseCallback("MYWIN",mouse_event,im)
+	while True:
+		cv2.imshow("MYWIN",im)
+		cv2.waitKey(50)
+	cv2.destroyAllWindows()
