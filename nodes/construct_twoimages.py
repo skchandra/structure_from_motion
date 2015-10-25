@@ -8,6 +8,8 @@ from cv_bridge import CvBridge
 
 from show_depth import *
 
+from sfm import *
+
 # D = np.array( [0.07151361939824905, -0.19481871818164997, 0.006885482396599795, -0.0065266433799991965, 0.0])
 # K = np.array( [[634.1625796919535, 0.0, 302.8222037975313], [0.0, 633.0839114382693, 253.7043901565232], [0.0, 0.0, 1.0]])
 
@@ -59,22 +61,23 @@ class Reconstruct3D:
 		    	self.correspondences[0].append((m.queryIdx, m.trainIdx))
 		    	self.correspondences[1].append((n.queryIdx, n.trainIdx))"""
 
-		old_image = cv2.cvtColor(self.image1, cv2.COLOR_BGR2GRAY)
-		new_image = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
-		# cv2.imshow('distorted', old_image)
-		# old_image = cv2.undistort(old_image,K,D)
-		# cv2.imshow('undistort', old_image)
-		# new_image = cv2.undistort(new_image,K,D)
-		flow = cv2.calcOpticalFlowFarneback(old_image, new_image, 0.5, 3, 12, 3, 5, 1.2, 0)
+		# old_image = cv2.cvtColor(self.image1, cv2.COLOR_BGR2GRAY)
+		# new_image = cv2.cvtColor(self.image2, cv2.COLOR_BGR2GRAY)
+		# # # cv2.imshow('distorted', old_image)
+		# # # old_image = cv2.undistort(old_image,K,D)
+		# # # cv2.imshow('undistort', old_image)
+		# # # new_image = cv2.undistort(new_image,K,D)
+		# flow = cv2.calcOpticalFlowFarneback(old_image, new_image, 0.5, 3, 12, 3, 5, 1.2, 0)
 		
-		# create array of points
-		for y in range(0, old_image.shape[0], 6):
-			for x in range(0, old_image.shape[1], 6):
-				if abs(flow[y][x][0] > 0.1) and abs(flow[y][x][1] > 0.1):
-					self.correspondences[0].append((y,x))
-					self.correspondences[1].append((y + flow[y][x][0],
-													x + flow[y][x][1]))
-
+		# # create array of points
+		# for y in range(0, old_image.shape[0], 6):
+		# 	for x in range(0, old_image.shape[1], 6):
+		# 		if abs(flow[y][x][0] > 0.1) and abs(flow[y][x][1] > 0.1):
+		# 			self.correspondences[0].append((y,x))
+		# 			self.correspondences[1].append((y + flow[y][x][0],
+		# 											x + flow[y][x][1]))
+		construct(self.image1, self.image2)
+		
 		# sift = cv2.SIFT()
 
 		# pts0 = sift.detect(self.image1, None)
@@ -145,7 +148,7 @@ class Reconstruct3D:
 				elif not self.calculated_flow:
 					self.optical_flow()
 					self.calculated_flow = True
-					show_depth(self.image1, self.image2, self.correspondences)
+					# show_depth(self.image1, self.image2, self.correspondences)
 
 					#cv2.imshow('before flow', self.image1)
 					#cv2.imshow('optical flow', self.image2)

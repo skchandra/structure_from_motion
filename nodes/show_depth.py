@@ -110,11 +110,15 @@ def show_depth(im1, im2, correspondences):
 	for i in range(im1_pts_ud_fixed.shape[1]):
 		epipolar_error[i] = test_epipolar(E,im1_pts_ud_fixed[0,i,:],im2_pts_ud_fixed[0,i,:])
 
-	F = np.linalg.inv(K.T).dot(E).dot(np.linalg.inv(K))
+	#F = np.linalg.inv(K.T).dot(E).dot(np.linalg.inv(K))
+	F = K.T * E * K
 	U, Sigma, V = np.linalg.svd(E)
 
-	R1 = U.dot(W).dot(V)
-	R2 = U.dot(W.T).dot(V)
+	R1 = U * W * V.T
+	W_inv = np.linalg.inv(W)
+	R2 = U * W_inv * V.T
+	#R1 = U.dot(W).dot(V)
+	#R2 = U.dot(W.T).dot(V)
 
 	if np.linalg.det(R1)+1.0 < 10**-8:
 		# flip sign of E and recompute everything
