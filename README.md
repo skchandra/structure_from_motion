@@ -2,6 +2,7 @@
 CompRobo project to restructure and visualize 3D objects from camera images. 
 
 What was the goal of your project?
+
 The goal of the project is to construct a three-dimensional point cloud (similar to a laser scan) based on multiple views of the same object. This technique is often referred to as structure from motion, and it exploits various algorithms that are built-in to OpenCV. Its main application is to generate complex 3D images based on changes in the image view - there are a couple of mobile apps that implement this algorithm using the inertial sensor in the phone.
 
 Describe how your system works.  Make sure to include the basic components and algorithms that comprise your project.
